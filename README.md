@@ -12,6 +12,7 @@ My scripts are heavily based off of those that came before me:
 - [thagrols' Ethernet Gadget Guide](https://github.com/thagrol/Guides)
 - [Plug-and-play Raspberry Pi USB webcam Tutorial](https://www.raspberrypi.com/tutorials/plug-and-play-raspberry-pi-usb-webcam/)
 - [uvc-gadget example script](https://gitlab.freedesktop.org/camera/uvc-gadget/)
+- [Red Hat Documentation - Chapter 6: Configuring a network bridge by using nmcli](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/8/html/configuring_and_managing_networking/configuring-a-network-bridge_configuring-and-managing-networking#configuring-a-network-bridge-by-using-nmcli_configuring-a-network-bridge)
 
 I've mostly mix-and-matched the above various scripts and have automated grabbing the Raspberry Pi's
 serial number from device-tree information. In the case of the ethernet gadget, I've also created MAC
