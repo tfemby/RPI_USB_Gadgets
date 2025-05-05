@@ -11,7 +11,7 @@ My scripts are heavily based off of those that came before me:
 - [USB Gadget ConfigFS documentation](https://www.kernel.org/doc/html/latest/usb/gadget_configfs.html) 
 - [thagrols' Ethernet Gadget Guide](https://github.com/thagrol/Guides)
 - [Plug-and-play Raspberry Pi USB webcam Tutorial](https://www.raspberrypi.com/tutorials/plug-and-play-raspberry-pi-usb-webcam/)
-- [uvc-gadget example script](gitlab.freedesktop.org/camera/uvc-gadget/-/blob/master/scripts/uvc-gadget.sh)
+- [uvc-gadget example script](https://gitlab.freedesktop.org/camera/uvc-gadget/)
 
 I've mostly mix-and-matched the above various scripts and have automated grabbing the Raspberry Pi's
 serial number from device-tree information. In the case of the ethernet gadget, I've also created MAC
@@ -20,8 +20,10 @@ addresses from the Pi's serial number as well.
 Prior to using these scripts, ensure that you've added the following to your `/boot/firmware/config.txt`:
 
 ```
-
+dtoverlay=dwc2,dr_mode=peripheral
 ```
+
+Then reboot the Pi. This will cause the Pi to boot with the DWC2 controller running in peripheral mode.
 
 ## Script Usage
 
