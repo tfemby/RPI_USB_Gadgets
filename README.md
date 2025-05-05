@@ -32,8 +32,8 @@ Provided you have the correct hardware, the only thing you'll need to change in 
 
 To use the scripts, you may invoke it like so:
 
-```
-ethernetGadget.sh {start|stop}
+```console
+root@raspberry:~# ethernetGadget.sh {start|stop}
 ```
 
 On start, the script should `modprobe libcomposite` and populate `/sys/kernel/config/usb_gadget`.
@@ -48,25 +48,31 @@ error messages littering `journalctl`.
 
 <details>
 
+Enter the `RPI_USB_Gadgets` directory:
+
+```console
+user@raspberry:~ $ cd RPI_USB_Gadgets
+```
+
 Copy `ethernet_gadget/ethernetGadget.sh` to `/usr/local/bin/`
 
-```
-# cp ethernet_gadget/ethernetGadget.sh /usr/local/bin
+```console
+user@raspberry:~/RPI_USB_Gadgets $ sudo cp ethernet_gadget/ethernetGadget.sh /usr/local/bin
 ```
 
 Copy `ethernetGadget.service` to `/etc/systemd/system/`
 
-```
-# cp ethernet_gadget/ethernetGadget.service /etc/systemd/system
+```console
+user@raspberry:~/RPI_USB_Gadgets $ sudo cp ethernet_gadget/ethernetGadget.service /etc/systemd/system
 ```
 
 The ethernet gadget is enabled with:
 
-```
-# systemctl enable --now ether-gadget
+```console
+user@raspberry:~/RPI_USB_Gadgets $ sudo systemctl enable --now ether-gadget.service
 ```
 
-This will launch the ethernet gadget during boot, after `network-online.target`. The networking interface
+This will create the ethernet gadget during boot, after `network-online.target`. The networking interface
 created by the gadget is brought online using `nmcli connection up usb0`.
 
 From here, you may use use `nmcli`, `nmtui` or your favourite GUI tool to configure network settings.
