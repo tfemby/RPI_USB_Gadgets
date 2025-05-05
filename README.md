@@ -78,6 +78,8 @@ created by the gadget is brought online using `nmcli connection up usb0`.
 
 From here, you may use use `nmcli`, `nmtui` or your favourite GUI tool to configure network settings.
 
+### Networking Configuration
+
 The Pi will effectively now be connected to your host machine with a wifi connection. Thagrols guide
 explains that there are two ways to make use of this connection:
 
@@ -116,8 +118,9 @@ user@pc:/ $ nmcli connection delete "Auto Ethernet"
 Connection 'Auto Ethernet' (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx) successfully deleted.
 ```
 
-Plug your micro-usb into your Pi's data port (if using a Pi Zero) and the other end into a usb port of your
-host. I'm not fully sure about how this works on other versions of Pi's but this works for me.
+Plug your micro-usb into your Pi's data port (if using a Pi Zero or Pi Zero 2) and the other end into a
+usb port of your host. I'm not fully sure about how this works on other versions of Pi's but this works
+for me.
 
 Now find the usb0 interface on the host. It may have been renamed.
 
