@@ -1,0 +1,15 @@
+# systemd service to start ether-gadget
+
+[Unit]
+Description=Raspberry Pi Ethernet Gadget
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/ethernetGadget.sh start
+ExecStop=/usr/local/bin/ethernetGadget.sh stop
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
