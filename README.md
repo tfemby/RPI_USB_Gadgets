@@ -49,19 +49,27 @@ error messages littering `journalctl`.
 
 <details>
 
+The following is performed on the Raspberry Pi.
+
+Clone this repo:
+
+```console
+user@raspberry:~/ $ git clone https://github.com/tfemby/RPI_USB_Gadgets.git
+```
+
 Enter the `RPI_USB_Gadgets` directory:
 
 ```console
-user@raspberry:~ $ cd RPI_USB_Gadgets
+user@raspberry:~/ $ cd RPI_USB_Gadgets
 ```
 
-Copy `ethernet_gadget/ethernetGadget.sh` to `/usr/local/bin/`
+Copy `ethernet_gadget/ethernetGadget.sh` to `/usr/local/bin/`:
 
 ```console
 user@raspberry:~/RPI_USB_Gadgets $ sudo cp ethernet_gadget/ethernetGadget.sh /usr/local/bin
 ```
 
-Copy `ethernetGadget.service` to `/etc/systemd/system/`
+Copy `ethernetGadget.service` to `/etc/systemd/system/`:
 
 ```console
 user@raspberry:~/RPI_USB_Gadgets $ sudo cp ethernet_gadget/ethernetGadget.service /etc/systemd/system
@@ -77,6 +85,7 @@ This will create the ethernet gadget during boot, after `network-online.target`.
 created by the gadget is brought online using `nmcli connection up usb0`.
 
 From here, you may use use `nmcli`, `nmtui` or your favourite GUI tool to configure network settings.
+The Raspberry Pi itself is responsible for either obtaining an IP address or statically setting it.
 
 ### Networking Configuration
 
