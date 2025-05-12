@@ -135,11 +135,15 @@ lo          loopback  connected (externally)  lo
 enp1s0f0u4  ethernet  disconnected            --                 
 ```
 
-Now we know that `enp1s0f0u4` is the name of the usb interface on the host. `enp5s0` is the name of the
-ethernet port on the host as well. Take note of both of these as the names of both will be required
-when we "connect" these interfaces into the bridge.
+Now we know that: 
 
-Speaking of the bridge, we will create a bridge named, `bridge0`.
+- `enp1s0f0u4` is the name of the usb interface on the host
+- `enp5s0` is the name of the ethernet port on the host
+
+Take note of both of these as the names of both will be required when we "connect" these interfaces into
+the bridge.
+
+Let's now create a bridge named, `bridge0`.
 
 ```console
 user@pc:~/ $ nmcli connection add type bridge con-name bridge0 ifname bridge0
@@ -147,8 +151,7 @@ Connection 'bridge0' (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx) successfully added.
 
 ```
 
-Next up is creating a connection profile for our two interfaces we identified earlier. Those being `enp5s0`
-and `enp1s0f0u4`.
+Now we'll create connection profiles for our two interfaces - `enp1s0f0u4` & `enp5s0`.
 
 ```console
 user@pc:~/ $ nmcli connection add type ethernet slave-type bridge con-name bridge0-host-pc ifname enp5s0 master bridge0 
@@ -159,7 +162,7 @@ Connection 'bridge0-eth-gadget' (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx) successfu
 ```
 
 Each interface connected to `bridge0` doesn't have it's own IP address. On the host, the only interface
-which will get an interface is `bridge0` itself. If you're using DHCP, you don't need to do anything else.
+which will get an IP address is `bridge0` itself. If you're using DHCP, you don't need to do anything else.
 If you want your PC to have be accessible with a static IP, the following command do just that.
 
 ```console
@@ -171,7 +174,7 @@ The previous command doesn't provide any feedback for some reason but you can ve
 interface now has the ipv4 info set we set just before.
 
 ```console
-user@pc:/ $ nmcli connection show bridge0 | grep ipv4
+user@pc:~/ $ nmcli connection show bridge0 | grep ipv4
 ipv4.method:                            manual
 ipv4.dns:                               10.0.0.1
 ipv4.dns-search:                        example.com
@@ -204,8 +207,45 @@ ipv4.link-local:                        0 (default)
 ipv4.dhcp-reject-servers:               --
 ipv4.auto-route-ext-gw:                 -1 (default)
 ```
-I personally had some issues when only bringing up `bridge0` so I instead disconnect the hardware based
-interfaces + `bridge0` then bring them all back up.
+Likewise, if using DHCP, the above command will look similar.
+
+```console
+user@pc:~/ $ nmcli connection show bridge0 | grep ipv4
+ipv4.method:                            auto
+ipv4.dns:                               --
+ipv4.dns-search:                        --
+ipv4.dns-options:                       --
+ipv4.dns-priority:                      0
+ipv4.addresses:                         10.0.0.21/24
+ipv4.gateway:                           10.0.0.1
+ipv4.routes:                            --
+ipv4.route-metric:                      -1
+ipv4.route-table:                       0 (unspec)
+ipv4.routing-rules:                     --
+ipv4.replace-local-rule:                -1 (default)
+ipv4.dhcp-send-release:                 -1 (default)
+ipv4.ignore-auto-routes:                no
+ipv4.ignore-auto-dns:                   no
+ipv4.dhcp-client-id:                    --
+ipv4.dhcp-iaid:                         --
+ipv4.dhcp-dscp:                         --
+ipv4.dhcp-timeout:                      0 (default)
+ipv4.dhcp-send-hostname:                yes
+ipv4.dhcp-hostname:                     --
+ipv4.dhcp-fqdn:                         --
+ipv4.dhcp-hostname-flags:               0x0 (none)
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv4.required-timeout:                  -1 (default)
+ipv4.dad-timeout:                       -1 (default)
+ipv4.dhcp-vendor-class-identifier:      --
+ipv4.link-local:                        0 (default)
+ipv4.dhcp-reject-servers:               --
+ipv4.auto-route-ext-gw:                 -1 (default)
+```
+
+I personally had some issues when only bringing up `bridge0` so I instead bring `down` the hardware
+based interfaces + `bridge0` then bring them all back up.
 
 ```console
 user@pc:~/ $ nmcli connection down bridge0-host-pc
