@@ -117,7 +117,7 @@ Because I've only needed the bridge setup, I'll cover how to configure a network
 
 **!!! NOTE: You can only bridge ethernet interfaces!!!**
 If you are using wifi on your host, look into configuring routed access. Thragols guide (linked above) contains
-a section about how confiure a routed setup.
+a section about how configure a routed setup.
 
 **All of the following is to be performed on your PC; Not on the Raspberry Pi.**
 
