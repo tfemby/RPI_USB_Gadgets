@@ -87,10 +87,11 @@ created by the gadget is brought online using `nmcli connection up usb0`.
 From here, you may use use `nmcli`, `nmtui` or your favourite GUI tool to configure network settings.
 The Raspberry Pi itself is responsible for either obtaining an IP address or statically setting it.
 
-### Networking Configuration
+### Networking Configuration Options
 
-The Pi will effectively now be connected to your host machine with a wifi connection. Thagrols guide
-explains that there are two ways to make use of this connection:
+The Pi will effectively now be connected to your host machine with an "ethernet" connection. If already
+configured, the wifi connection will also still work. Thagrols guide (linked above) explains that there are
+two ways to make use of this connection:
 
 1. Bridged Access
     - You create a virtual network bridge on the host for bridged access.
@@ -100,8 +101,8 @@ explains that there are two ways to make use of this connection:
         - Your networks router will assign an IP Address if you use a DHCP.
         - The Pi will consequently have two IP addresses: One for wifi and one for usb0.
 2. Routed Access
-    - You create firewall rules which allow the host to forward packets the the Pi.
-        - The host (roughly speaking) acts as a router.
+    - You create firewall rules which allow the host to forward packets to the Pi.
+        - The host will act as a router.
     - Allows the Pi to use the hosts physical connection.
     - The usb0 interface interface gets a local IP address from the Host.
         - The Pi is behind a NAT meaning that unless ports are explicitly opened on the host, other computers
@@ -110,12 +111,17 @@ explains that there are two ways to make use of this connection:
         - The inverse of the above: The host is now behind a NAT and port management will be needed to
           communicate with other devices on the network.
 
-Since I use Linux for my desktop, I also use Network-Manager on my PC as well.
-Because I've needed the bridge setup, I did the following on the host (My PC, not the Pi):
+#### Bridged Access
+Since I use Linux for my desktop, I use Network Manager on my PC as well.
+Because I've only needed the bridge setup, I'll cover how to configure a network bridge using Network Manager.
+
+**!!! NOTE: You can only bridge ethernet interfaces!!!**
+If you are using wifi on your host, look into configuring routed access. Thragols guide (linked above) contains
+a section about how confiure a routed setup.
+
+**All of the following is to be performed on your PC; Not on the Raspberry Pi.**
 
 Remove any pre-configured network connections:
-**NOTE: You can only bridge ethernet interfaces**. If you are using wifi on your host, look into configuring
-          routed access.
 
 ```console
 user@pc:~/ $ nmcli connection show
