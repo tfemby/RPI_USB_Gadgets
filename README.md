@@ -130,7 +130,7 @@ May 05 16:00:00 pc kernel: cdc_ether 1-4:1.0 enp1s0f0u4: renamed from usb0
 
 user@pc:~/ $ nmcli device status
 DEVICE      TYPE      STATE                   CONNECTION         
-enp5s0      ethernet  connected               Wired connection 1 
+enp5s0      ethernet  connected               Auto Ethernet
 lo          loopback  connected (externally)  lo                 
 enp1s0f0u4  ethernet  disconnected            --                 
 ```
