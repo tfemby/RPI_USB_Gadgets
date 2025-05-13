@@ -27,7 +27,8 @@ Raspberry Pi OS: Bookworm has made some changes to the default OS which leads me
 OS is going to be managed more like a desktop distro going into the future. I don't see NetworkManager
 going anywhere for a little while and I certainly don't see Systemd going anywhere for at least a decade.
 Although unlikely, if anybody reads this and finds this useful in the future, I hope that my work updating
-these scripts has at least given you a proper chance in getting your Raspberry Pi based USB project.
+these scripts has at least given you a proper chance in getting your Raspberry Pi based USB project to
+a roaring start!
 
 ## Pre-Setup
 
