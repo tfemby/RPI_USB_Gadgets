@@ -1,0 +1,10 @@
+# systemd service to start uvcGadget
+
+[Unit]
+Description=Raspberry Pi UVC Gadget
+
+[Service]
+Type=simple
+ExecStartPre=/usr/local/bin/uvcGadget.sh start
+ExecStart=/usr/bin/uvc-gadget -c 0 uvc.0
+ExecStopPost=/usr/local/bin/uvcGadget.sh stop

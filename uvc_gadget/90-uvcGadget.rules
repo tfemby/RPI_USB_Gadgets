@@ -1,0 +1,5 @@
+SUBSYSTEM=="video4linux" \
+, ACTION=="add" \
+, KERNEL=="video0" \
+, RUN+="/usr/bin/sleep 5s" \
+, RUN+="/usr/bin/systemctl start uvcGadget.service"
