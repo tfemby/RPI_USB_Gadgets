@@ -278,7 +278,7 @@ ipv4 address from your networks router.
 
 ## UVC Gadget (Webcam)
 
-### TODO: Write this section and clean up the UVC gadget script
+### TODO: Write this section
 
-The webcam gadget gadget utilises a udev rule to load the corresponding systemd-service after the
-kernel has loaded the necessary camera modules.
+The webcam gadget gadget utilises a udev rule to load the corresponding systemd service after the
+kernel has loaded the camera modules.
