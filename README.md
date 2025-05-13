@@ -18,6 +18,19 @@ I've mostly mix-and-matched the above various scripts and have automated grabbin
 serial number from device-tree information. In the case of the ethernet gadget, I've also created MAC
 addresses from the Pi's serial number as well.
 
+In addition, I've written systemd-service files (and a udev rule for the uvc gadget) as most distros
+have moved onto using Systemd. I believe this approach will hopefully keep these files from obsolescence
+for at least a few years. If you're using something else, then you're free to adapt these files as you
+see fit.
+
+Raspberry Pi OS: Bookworm has made some changes to the default OS which leads me to believe that the
+OS is going to be managed more like a desktop distro going into the future. I don't see NetworkManager
+going anywhere for a little while and I certainly don't see Systemd going anywhere for at least a decade.
+Although unlikely, if anybody reads this and finds this useful in the future, I hope that my work updating
+these scripts has at least given you a proper chance in getting your Raspberry Pi based USB project.
+
+## Pre-Setup
+
 Prior to using these scripts, ensure that you've added the following to your `/boot/firmware/config.txt`:
 
 ```
