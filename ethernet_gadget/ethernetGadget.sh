@@ -23,16 +23,16 @@ BCD_VER="0x0200"
 ## Gather Device Information for Strings Information
 STR_SER="$(sed 's/0000\(\w*\)/\1/' <(strings /proc/device-tree/serial-number))"
 STR_PRO="$(strings /proc/device-tree/model) - ${GADGET_NAME}"
-STR_MFR="$(sed 's/^\(\w*\s*\w*\).*/\1/' <(echo ${STR_PRO}))"
+STR_MFR="$(sed 's/^\(\w*\s*\w*\).*/\1/' <(echo "${STR_PRO}"))"
 
 ## Configuration
 CON_CON="Config 1: ECM Network"
 CON_PWR="250"
 
 ## Create MAC Addresses from the Pi's serial Number
-MAC="$(sed 's/\(\w\w\)/:\1/g' <(echo ${STR_SER}) | cut -b 2-)"
-MAC_HOST="12$(echo ${MAC} | cut -b 3-)"
-MAC_DEV="02$(echo ${MAC} | cut -b 3-)"
+MAC="$(sed 's/\(\w\w\)/:\1/g' <(echo "${STR_SER}") | cut -b 2-)"
+MAC_HOST="12$(echo "${MAC}" | cut -b 3-)"
+MAC_DEV="02$(echo "${MAC}" | cut -b 3-)"
 
 ## Gather device information
 BOARD="$(strings /proc/device-tree/model)"
@@ -48,9 +48,7 @@ start)
     ## Load libcomposite
     if [ ! -d $GADGET ]; then
         echo "Loading composite module"
-        modprobe libcomposite
-
-        if [ $? -ne 0 ]; then
+        if ! modprobe libcomposite; then
             "Failed to load libcomposite"
             exit 1
         else
@@ -67,9 +65,8 @@ start)
     
         echo "Creating the USB Gadget"
         mkdir -p "${GADGET_DIR}"
-        cd "${GADGET_DIR}"
     
-        if [ $? -ne 0 ]; then
+        if ! cd "${GADGET_DIR}"; then
             echo "Error creating usb gadget in configfs"
             exit 1
         else
@@ -80,7 +77,7 @@ start)
         echo "${ID_VEN}" > "${GADGET_DIR}/idVendor"   # Linux Foundation
         echo "${ID_PRO}" > "${GADGET_DIR}/idProduct"  # Multifunction Composite Gadget
         echo "${BCD_DEV}" > "${GADGET_DIR}/bcdDevice" # v1.0.0
-        echo "${BCD_USB}" > "${GADGET_DIR}/bcdUSB"    # USB 2.0
+        echo "${BCD_VER}" > "${GADGET_DIR}/bcdUSB"    # USB 2.0
         echo "[ OK ]"
     
         echo "Setting English strings"
@@ -131,8 +128,7 @@ stop)
     echo "Bringing down network interface usb0"
     nmcli connection down usb0
 
-    cd "${GADGET_DIR}"
-    if [[ $? -ne 0 ]]; then
+    if ! cd "${GADGET_DIR}"; then
         echo "Error: No configfs gadget found"
         exit 1
     fi
