@@ -40,6 +40,21 @@ dtoverlay=dwc2,dr_mode=peripheral
 
 Then reboot the Pi. This will cause the Pi to boot with the DWC2 controller running in peripheral mode.
 
+I have also had success running the Pi using "USB On-The-Go" mode.
+
+```
+dtoverlay=dwc2,dr_mode=otg
+```
+
+On a Pi Zero|Zero W|Zero W 2, it's not strictly necessary at this time to set the `dr_mode`.
+
+```
+dtoverlay=dwc2
+```
+
+It's however good practice to probably set the dwc2 controller to either peripheral or otg. If your gadget
+doesn't work, try the other option.
+
 ## Script Usage
 
 Provided you have the correct hardware, the only thing you'll need to change in the scripts is the
