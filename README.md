@@ -416,5 +416,5 @@ Bus 001 Device 003: ID xxxx:xxxx Netchip Technology, Inc. Linux-USB Ethernet/RND
 If you can see the above, you may then actually test your camera using your preferred webcam software.
 I'm a fan of `kamoso` but anything from zoom or discord to OBS should also work.
 
-<details>
+</details>
 
