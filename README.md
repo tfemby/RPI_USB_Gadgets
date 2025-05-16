@@ -51,7 +51,8 @@ To use the scripts, you may invoke it like so:
 root@raspberry:~# ethernetGadget.sh {start|stop}
 ```
 
-On start, the script should `modprobe libcomposite` and populate `/sys/kernel/config/usb_gadget`.
+On start, the script should `modprobe libcomposite` and populate `/sys/kernel/config/usb_gadget`
+(ConfigFS).
 
 On stop, the script should deactivate the gadget and de-populate `/sys/kernel/config/usb_gadget`.
 
@@ -59,7 +60,12 @@ When stopping the gadget, I haven't been able to able to unload libcomposite; ho
 command is generally only run when shutting down. This simply provides a clean shutdown without
 error messages littering `journalctl`.
 
+The UVC Gadget script will configure ConfigFS but won't actually begin the UVC Gadget. Refer to the
+UVC section below to find out the details.
+
 ## Ethernet Gadget
+
+### Configuration
 
 <details>
 
@@ -292,7 +298,108 @@ ipv4 address from your networks router.
 
 ## UVC Gadget (Webcam)
 
-### TODO: Write this section
+### Reasoning
 
-The webcam gadget gadget utilises a udev rule to load the corresponding systemd service after the
-kernel has loaded the camera modules.
+The webcam gadget gadget utilises a Udev rule to load the corresponding Systemd service. The script purely
+configures ConfigFS. The reasoning behind splitting off the video stream from the script is because when
+wanting to stop the webcam via `systemctl stop uvcGadget.service`, the script was the parent process while
+the `uvc-gadget` process responsible for the stream became a zombie process. It instead made more sense for
+Systemd to keep track of the `uvc-gadget` process and just configure ConfigFS prior to running the binary.
+This was achieved by running `uvcGadget.sh start` using `ExecStartPre`|`ExecStopPost` in the Systemd unit.
+
+The reason for using a Udev rule was because Systemd simply was attempting to begin the `uvc-gadget` binary
+before the kernel had loaded the necessary kernel modules for the camera. This resulted in the gadget failing
+to load during boot and required manual intervention. Udev broadly speaking keeps track of hardware events
+during boot (and while the computer is running) and Udev rules can be run when a certain event occurs. In
+this case, when the `video4linux` subsystem creates the `video0` character device, it will run
+`systemctl start uvcGadget.service`.
+
+### Configuration
+
+<details>
+
+The following is performed on the Raspberry Pi.
+
+Clone this repo:
+
+```console
+user@raspberry:~/ $ git clone https://github.com/tfemby/RPI_USB_Gadgets.git
+```
+
+Enter the `RPI_USB_Gadgets` directory:
+
+```console
+user@raspberry:~/ $ cd RPI_USB_Gadgets
+```
+
+Copy `uvc_gadget/uvcGadget.sh` to `/usr/local/bin/`:
+
+```console
+user@raspberry:~/RPI_USB_Gadgets $ sudo cp uvc_gadget/uvcGadget.sh /usr/local/bin
+```
+
+Copy `uvc_gadget/uvcGadget.service` to `/etc/systemd/system/`:
+
+```console
+user@raspberry:~/RPI_USB_Gadgets $ sudo cp uvc_gadget/uvcGadget.service /etc/systemd/system
+```
+
+Copy `uvc_gadget/90-uvcGadget.rules` to `/etc/udev/rules.d/`:
+
+```console
+user@raspberry:~/RPI_USB_Gadgets $ sudo cp uvc_gadget/90-uvcGadget.rules /etc/udev/rules.d
+```
+
+Since all of these files have been installed, the only thing left is to build the `uvc-gadget`
+program.
+
+Begin by going back to the users home directory:
+
+```console
+user@raspberry:~/RPI_USB_Gadgets $ cd ~/
+```
+
+Clone the uvc-gadget repo:
+
+```console
+user@raspberry:~/ $ git clone https://gitlab.freedesktop.org/camera/uvc-gadget.git
+```
+
+Enter the `uvc-gadget` directory:
+
+```console
+user@raspberry:~/ $ cd uvc-gadget
+```
+
+Install the necessary dependencies:
+
+```console
+user@raspberry:~/uvc-gadget $ sudo apt install meson libcamera-dev libjpeg-dev
+```
+
+Now we can finally make, build and install the uvc-gadget program:
+
+```console
+user@raspberry:~/uvc-gadget $ make uvc-gadget
+user@raspberry:~/uvc-gadget $ cd build
+user@raspberry:~/uvc-gadget/build $ sudo meson install
+user@raspberry:~/uvc-gadget/build $ ldconfig
+```
+
+Because everything is now in place, we can finally reboot the Raspberry Pi. Ensure that the USB cable
+is plugged into the data port of the Pi Zero (not sure which port works on a regular Pi) with the other
+end plugged into your PC. Most desktops envrionments usually popup a notification or make a notification
+sound when the Raspberry Pi completes it boot. On a Linux system, you'll see the kernel load the, `uvcvideo`
+module. You may also see that running `lsusb` on the PC will show the following:
+
+```console
+user@pc:~/ $ lsusb
+...
+Bus 001 Device 003: ID xxxx:xxxx Netchip Technology, Inc. Linux-USB Ethernet/RNDIS Gadget
+...
+```
+If you can see the above, you may then actually test your camera using your preferred webcam software.
+I'm a fan of `kamoso` but anything from zoom or discord to OBS should also work.
+
+<details>
+
