@@ -315,7 +315,7 @@ ipv4 address from your networks router.
 
 ### Reasoning
 
-The webcam gadget gadget utilises a Udev rule to load the corresponding Systemd service. The script purely
+The webcam gadget utilises a Udev rule to load the corresponding Systemd service. The script purely
 configures ConfigFS. The reasoning behind splitting off the video stream from the script is because when
 wanting to stop the webcam via `systemctl stop uvcGadget.service`, the script was the parent process while
 the `uvc-gadget` process responsible for the stream became a zombie process. It instead made more sense for
