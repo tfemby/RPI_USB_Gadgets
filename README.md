@@ -33,6 +33,9 @@ Although unlikely, if anybody reads this and finds this useful in the future, I 
 these scripts has at least given you a proper chance in getting your Raspberry Pi based USB project to
 a roaring start!
 
+Now with Raspberry Pi OS: Trixie, it seems my intuition was correct. I've used these configurations on all of them
+and all of the scripts here seem to worked perfectly! :D
+
 ## Pre-Setup
 
 Prior to using these scripts, ensure that you've added the following to your `/boot/firmware/config.txt`:
