@@ -1,0 +1,12 @@
+[Unit]
+Description=USB Audio and Ethernet Composite Gadget
+After=network.target sound.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/audioRndisGadget.sh start
+ExecStop=/usr/local/bin/audioRndisGadget.sh stop
+
+[Install]
+WantedBy=multi-user.target

@@ -1,32 +1,34 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 ## Gadget Names
-GADGET_NAME="ethernetGadget" # This is the only thing you probably need to change
+GADGET_NAME="audio_rndis_config"
 CONFIG_FS="/sys/kernel/config"
 CONFIGS="configs/c.1"
 STRINGS="strings/0x409"
-FUNCTIONS="functions/ecm.usb0"
+FUNCTIONS_UAC="functions/uac2.usb0"
+FUNCTIONS_RNDIS="functions/rndis.usb0"
 
-## Directories
+# Directories
 GADGET="${CONFIG_FS}/usb_gadget"
 GADGET_DIR="${GADGET}/${GADGET_NAME}"
 CONFIGS_DIR="${GADGET_DIR}/${CONFIGS}"
 STRINGS_DIR="${GADGET_DIR}/${STRINGS}"
-FUNCTIONS_DIR="${GADGET_DIR}/${FUNCTIONS}"
+FUNCTIONS_DIR_UAC="${GADGET_DIR}/${FUNCTIONS_UAC}"
+FUNCTIONS_DIR_RNDIS="${GADGET_DIR}/${FUNCTIONS_RNDIS}"
 
-## Gadget Info
+# Gadget Info
 ID_VEN="0x1d6b"
 ID_PRO="0x0104"
 BCD_DEV="0x0100"
 BCD_VER="0x0200"
 
-## Gather Device Information for Strings Information
+# Gather Device Information for Strings Information
 STR_SER="$(sed 's/0000\(\w*\)/\1/' <(strings /proc/device-tree/serial-number))"
 STR_PRO="$(strings /proc/device-tree/model) - ${GADGET_NAME}"
 STR_MFR="$(sed 's/^\(\w*\s*\w*\).*/\1/' <(echo "${STR_PRO}"))"
 
 ## Configuration
-CON_CON="Config 1: ECM Network"
+CON_CON="${GADGET_NAME}"
 CON_PWR="250"
 
 ## Create MAC Addresses from the Pi's serial Number
@@ -36,6 +38,14 @@ MAC_DEV="02$(echo "${MAC}" | cut -b 3-)"
 
 ## Gather device information
 BOARD="$(strings /proc/device-tree/model)"
+
+# Audio Functions - Match these to your desired UAC2 format
+AUDIO_CHANNEL_MASK_CAPTURE=3 # 3 = Stereo (Input to PC)
+AUDIO_CHANNEL_MASK_PLAYBACK=3 # 3 = Stereo (Output from PC)
+AUDIO_SAMPLE_RATES_CAPTURE=44100,48000
+AUDIO_SAMPLE_RATES_PLAYBACK=44100,48000
+AUDIO_SAMPLE_SIZE_CAPTURE=2 # 2 = S16LE (16-bit)
+AUDIO_SAMPLE_SIZE_PLAYBACK=2 # 2 = S16LE (16-bit)
 
 ## Check for root
 if [[ $EUID -ne 0 ]]; then
@@ -81,7 +91,7 @@ start)
         echo "[ OK ]"
     
         echo "Setting English strings"
-        # /sys/kernel/config/usb_gadget/<name>/strings/0x409h
+        # /sys/kernel/config/usb_gadget/<name>/strings/0x409
         mkdir -p "${STRINGS_DIR}"
         echo "${STR_SER}" > "${STRINGS_DIR}/serialnumber"  # xxxxxxxxxxxx
         echo "${STR_MFR}" > "${STRINGS_DIR}/manufacturer"  # Raspberry Pi
@@ -95,12 +105,27 @@ start)
         echo "${CON_PWR}" > "${CONFIGS_DIR}/MaxPower"
         echo "[ OK ]"
     
-        echo "Creating USB device functions..."
-        # /sys/kernel/config/usb_gadget/<name>/functions/ecm.usb
-        mkdir -p "${FUNCTIONS_DIR}"
-        echo "${MAC_HOST}" > "${FUNCTIONS_DIR}/host_addr"
-        echo "${MAC_DEV}" > "${FUNCTIONS_DIR}/dev_addr"
-        ln -s "${FUNCTIONS_DIR}" "${CONFIGS_DIR}/"
+        echo "Creating USB UAC2 device functions..."
+        # /sys/kernel/config/usb_gadget/<name>/functions/uac
+        mkdir -p "${FUNCTIONS_DIR_UAC}"
+        echo "${AUDIO_CHANNEL_MASK_CAPTURE}" > "${FUNCTIONS_DIR_UAC}/c_chmask"
+        echo "${AUDIO_SAMPLE_RATES_CAPTURE}" > "${FUNCTIONS_DIR_UAC}/c_srate"
+        echo "${AUDIO_SAMPLE_SIZE_CAPTURE}" > "${FUNCTIONS_DIR_UAC}/c_ssize"
+        echo "${AUDIO_CHANNEL_MASK_PLAYBACK}" > "${FUNCTIONS_DIR_UAC}/p_chmask"
+        echo "${AUDIO_SAMPLE_RATES_PLAYBACK}" > "${FUNCTIONS_DIR_UAC}/p_srate"
+        echo "${AUDIO_SAMPLE_SIZE_PLAYBACK}" > "${FUNCTIONS_DIR_UAC}/p_ssize"
+        echo "[ OK ]"
+
+        echo "Creating USB RNDIS device functions..."
+        # /sys/kernel/config/usb_gadget/<name>/functions/rndis.usb
+        mkdir -p "${FUNCTIONS_DIR_RNDIS}"
+        echo "${MAC_HOST}" > "${FUNCTIONS_DIR_RNDIS}/host_addr"
+        echo "${MAC_DEV}" > "${FUNCTIONS_DIR_RNDIS}/dev_addr"
+        echo "[ OK ]"
+
+        echo "Symlinking functions to configurations"
+        ln -s "${FUNCTIONS_DIR_UAC}" "${CONFIGS_DIR}/"
+        ln -s "${FUNCTIONS_DIR_RNDIS}" "${CONFIGS_DIR}/"
         echo "[ OK ]"
     
         echo "Binding USB Device Controller"
@@ -113,9 +138,10 @@ start)
     fi
     
     ## Configure an ipv4 adress to the usb0 interface
-    # Handle IP with NetworkManager
+    # Sleep for 5 seconds to allow the Pi the configure the gadget
     echo "Sleeping for 5 seconds..."
     sleep 5s
+    # Handle IP with NetworkManager
     echo "Bringing up network interface usb0"
     nmcli connection up usb0
     
@@ -141,13 +167,15 @@ stop)
     echo "[ OK ]"
 
     echo "Clearing configurations"
-    rm "${CONFIGS_DIR}/ecm.usb0"
+    rm "${CONFIGS_DIR}/uac2.usb0"
+    rm "${CONFIGS_DIR}/rndis.usb0"
     rmdir "${CONFIGS_DIR}/${STRINGS}"
     rmdir "${CONFIGS_DIR}"
     echo "[ OK ]"
 
     echo "Clearing Gadget Functionality"
-    rmdir "${FUNCTIONS_DIR}"
+    rmdir "${FUNCTIONS_DIR_UAC}"
+    rmdir "${FUNCTIONS_DIR_RNDIS}"
     echo "[ OK ]"
 
     echo "Clearing English strings"
@@ -165,4 +193,3 @@ stop)
     echo "Usage: $0 {start|stop}"
     ;;
 esac
-
