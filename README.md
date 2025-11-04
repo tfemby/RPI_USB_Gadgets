@@ -147,6 +147,7 @@ two ways to make use of this connection:
           communicate with other devices on the network.
 
 #### Bridged Access
+
 Since I use Linux for my desktop, I use Network Manager on my PC as well.
 Because I've only needed the bridge setup, I'll cover how to configure a network bridge using Network Manager.
 
@@ -185,7 +186,7 @@ lo          loopback  connected (externally)  lo
 enp1s0f0u4  ethernet  disconnected            --                 
 ```
 
-Now we know that: 
+Now we know that:
 
 - `enp1s0f0u4` is the name of the usb interface on the host
 - `enp5s0` is the name of the ethernet port on the host
@@ -418,3 +419,44 @@ I'm a fan of `kamoso` but anything from zoom or discord to OBS should also work.
 
 </details>
 
+## Composite Audio and RNDIS Gadget
+
+### Configuration
+
+<details>
+
+The following is performed on the Raspberry Pi.
+
+Clone this repo:
+
+```console
+user@raspberry:~/ $ git clone https://github.com/tfemby/RPI_USB_Gadgets.git
+```
+
+Enter the `RPI_USB_Gadgets` directory:
+
+```console
+user@raspberry:~/ $ cd RPI_USB_Gadgets
+```
+
+Copy `audio_rndis_gadget/audioRndisGadgete.sh` to `/usr/local/bin/`:
+
+```console
+user@raspberry:~/RPI_USB_Gadgets $ sudo cp audio_rndis_gadget/audioRndisGadget.sh /usr/local/bin
+```
+
+Copy `audio_rndis_gadget/audio-rndis-gadget.service` to `/etc/systemd/system/`:
+
+```console
+user@raspberry:~/RPI_USB_Gadgets $ sudo cp audio_rndis_gadget/audio-rndis-gadget.service /etc/systemd/system/
+```
+
+The composite audio and RNDIS gadget is enabled with:
+
+```console
+user@raspberry:~/RPI_USB_Gadgets $ sudo systemctl enable --now audio-rndis-gadget.service
+```
+
+Networking configuration can be configured in the same way as in the [ethernet section above](#bridged-access).
+
+</details>
