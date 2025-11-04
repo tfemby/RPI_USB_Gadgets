@@ -10,9 +10,12 @@ My scripts are heavily based off of those that came before me:
 
 - [USB Gadget ConfigFS documentation](https://www.kernel.org/doc/html/latest/usb/gadget_configfs.html)
 - [thagrols' Ethernet Gadget Guide](https://github.com/thagrol/Guides)
+- [Collaboras modern USB Gadget guide](https://www.collabora.com/news-and-blog/blog/2019/02/18/modern-usb-gadget-on-linux-and-how-to-integrate-it-with-systemd-part-1/)
 - [Plug-and-play Raspberry Pi USB webcam Tutorial](https://www.raspberrypi.com/tutorials/plug-and-play-raspberry-pi-usb-webcam/)
 - [uvc-gadget example script](https://gitlab.freedesktop.org/camera/uvc-gadget/)
 - [Red Hat Documentation - Chapter 6: Configuring a network bridge by using nmcli](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/8/html/configuring_and_managing_networking/configuring-a-network-bridge_configuring-and-managing-networking#configuring-a-network-bridge-by-using-nmcli_configuring-a-network-bridge)
+- [hackster.io - RPi Z2W USB Soundcard](https://www.hackster.io/masonrf/rpi-z2w-usb-soundcard-78e757)
+- [Set up a Linux Audio DSP UAC2](https://www.diyaudio.com/community/attachments/rpi_usb_audio_gadet-pdf.1158959/)
 
 I've mostly mix-and-matched the above various scripts and have automated grabbing the Raspberry Pi's
 serial number from device-tree information. In the case of the ethernet gadget, I've also created MAC
