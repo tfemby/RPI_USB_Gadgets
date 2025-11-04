@@ -559,7 +559,7 @@ Now begin the pipewire user service.
 user@raspberry:~/ $ systemctl --user enable --now pipewire.service pipewire.socket
 ```
 
-Finally, open up `raspi-config` and configure the Pi to login automatically on boot.
+Open up `raspi-config` and configure the Pi to login automatically on boot.
 
 ```console
 user@raspberry:~/ $ sudo raspi-config
@@ -567,10 +567,38 @@ user@raspberry:~/ $ sudo raspi-config
 
 Within raspi config go to System Options -> Auto Login -> Yes
 
-Finally reboot the Pi and on boot, everything should boot up normally.
+Finally reboot the Pi.
 
 ```console
 user@raspberry:~/ $ sudo reboot
 ```
 
+Upon boot, check to make sure that the loopback devices have been configured correctly.
+
+```console
+user@raspberry:~/ $ wpctl status
+...
+Audio
+ ├─ Devices:
+ │      49. Built-in Audio                      [alsa]
+ │      77. Built-in Audio                      [alsa]
+ │
+ ├─ Sinks:
+ │  *   62. Built-in Audio Stereo               [vol: 0.60]
+ │      78. Built-in Audio Stereo               [vol: 0.40]
+ │
+ ├─ Sources:
+ │  *   76. Built-in Audio Stereo               [vol: 80.00]
+ │
+ ├─ Filters:
+ │    - loopback-1325-30
+ │      36. output.loopback-1325-30                                      [Stream/Output/Audio]
+ │      37. input.loopback-1325-30                                       [Stream/Input/Audio]
+ │
+ └─ Streams:
+...
+
+```
+
+Last but not least, set the output device on your PC to `Multifunction Composite Gadget Analog Stereo`
 </details>
