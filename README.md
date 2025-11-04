@@ -8,7 +8,7 @@ Due to only really using the UVC and ethernet gadgets, I've only written scripts
 
 My scripts are heavily based off of those that came before me:
 
-- [USB Gadget ConfigFS documentation](https://www.kernel.org/doc/html/latest/usb/gadget_configfs.html) 
+- [USB Gadget ConfigFS documentation](https://www.kernel.org/doc/html/latest/usb/gadget_configfs.html)
 - [thagrols' Ethernet Gadget Guide](https://github.com/thagrol/Guides)
 - [Plug-and-play Raspberry Pi USB webcam Tutorial](https://www.raspberrypi.com/tutorials/plug-and-play-raspberry-pi-usb-webcam/)
 - [uvc-gadget example script](https://gitlab.freedesktop.org/camera/uvc-gadget/)
@@ -80,7 +80,7 @@ UVC section below to find out the details.
 
 ## Ethernet Gadget
 
-### Configuration
+### Configuration - Ethernet Gadget
 
 <details>
 
@@ -330,7 +330,7 @@ during boot (and while the computer is running) and Udev rules can be run when a
 this case, when the `video4linux` subsystem creates the `video0` character device, it will run
 `systemctl start uvcGadget.service`.
 
-### Configuration
+### Configuration - UVC Gadget
 
 <details>
 
@@ -421,7 +421,11 @@ I'm a fan of `kamoso` but anything from zoom or discord to OBS should also work.
 
 ## Composite Audio and RNDIS Gadget
 
-### Configuration
+This gadget configures a UAC2 audio device as well as a RNDIS device. UAC2 will make the raspberry pi look like an
+audio device to the host PC. RNDIS is very similar to the ethernet gadget and will make the usb connection look like
+an ethernet device to the host PC.
+
+### Configuration - Composite Audio and RNDIS Gadget
 
 <details>
 
@@ -457,6 +461,106 @@ The composite audio and RNDIS gadget is enabled with:
 user@raspberry:~/RPI_USB_Gadgets $ sudo systemctl enable --now audio-rndis-gadget.service
 ```
 
-Networking configuration can be configured in the same way as in the [ethernet section above](#bridged-access).
+#### RNDIS Configuration
+
+Since RNDIS is similar to the ethernet gadget, it can be configured in the same way as in the bridged-access section of
+the [ethernet gadget section above](#ethernet-gadget).
+
+#### UAC2 Configuration
+
+For the UAC2 gadget, you should now see an audio device within your also list.
+
+```console
+aplay -l
+**** List of PLAYBACK Hardware Devices ****
+card 0: sndrpihifiberry [snd_rpi_hifiberry_dac], device 0: HifiBerry DAC HiFi pcm5102a-hifi-0 [HifiBerry DAC HiFi pcm5102a-hifi-0]
+  Subdevices: 0/1
+  Subdevice #0: subdevice #0
+card 1: UAC2Gadget [UAC2_Gadget], device 0: UAC2 PCM [UAC2 PCM]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+```
+
+In my case, I have a RaspiAudio v2 hat connected to my Pi and the device tree is using the a HifiBerry DAC
+config to load the appropriate kernel modules and set the correct GPIO pins. Take note of the card numbers for the real
+device and the UAC2 device.
+
+- card 0: Real device
+- card 1: UAC2 device
+
+If you've tried to play audio through the UAC2 device on the host PC, no audio would come through. That's because
+the UAC2 interface isn't representing a real device. To make this work as intended, I'm utilising a loopback device
+within pipewire to "bridge" both the real device and the UAC2 device together.
+
+Because I don't like running pipewire in system mode, I'm going to run it in user mode. For this to work, begin by
+copying a pipewire default configuration.
+
+```console
+user@raspberry:~/ $ mkdir -p ~/.config/pipewire
+user@raspberry:~/ $ cp /usr/share/pipewire/pipewire.conf ~/.config/pipewire
+```
+
+Now using your favourite text editor (use `nano` if you're more comfortable with that), edit `~/.config/pipewire` and
+add the following to the `context.modules` section.
+
+```console
+user@raspberry:~/ $ vim ~/.config/pipewire/pipewire.conf
+```
+
+```lua ~/.config/pipewire/pipewire.conf
+...
+context.modules = [
+    ...
+    {
+        name = "libpipewire-module-loopback",
+        args = {
+            # Set a recognizable name for the loopback node
+            node.description = "audio-gadget-to-real-device",
+
+            # Set the capture device (Input from PC via Audio Gadget, card 1)
+            capture.props = {
+                node.description = "Audio Gadget Input (Card 1)",
+                alsa.card = 1
+            },
+
+            # Set the playback device (Output to the real device, card 0)
+            playback.props = {
+                node.description = "Real Device Output (Card 0)",
+                alsa.card = 0
+            },
+
+            # Use the specific channels and format for reliability (matching your gadget settings)
+            audio.channels = 2,
+            audio.format = "S16LE",
+            audio.rate = 48000,
+
+            # Make the connection permanent
+            auto.connect = true
+        }
+    }
+]
+...
+
+```
+
+Now begin the pipewire user service.
+
+```console
+user@raspberry:~/ $ systemctl --user enable --now pipewire.service pipewire.socket
+```
+
+Finally, open up `raspi-config` and configure the Pi to login automatically on boot.
+
+```console
+user@raspberry:~/ $ sudo raspi-config
+```
+
+Within raspi config go to System Options -> Auto Login -> Yes
+
+Finally reboot the Pi and on boot, everything should boot up normally.
+
+```console
+user@raspberry:~/ $ sudo reboot
+```
 
 </details>
