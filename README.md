@@ -474,7 +474,11 @@ the [ethernet gadget section above](#ethernet-gadget).
 
 #### UAC2 Configuration
 
-For the UAC2 gadget, you should now see an audio device within your also list.
+UAC2 is a bi-directional protocol. This mean that you can stream audio to and from the pi. If the Pi has a microphone
+plugged in, you could theoretically also use it as an input device. For this example, I'm simply going to focus on the
+host sending Audio to the Pi. To configure a more complex setup, you'd need to look into pipewire configuration.
+
+For the UAC2 gadget, the Pi's alsa list should show the UAC2 device.
 
 ```console
 aplay -l
